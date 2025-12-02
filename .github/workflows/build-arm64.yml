@@ -330,17 +330,17 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libavcodec)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libavcodec.so (as libffmpeg.mx.so)
+      - name: Upload libavcodec.so
         uses: actions/upload-artifact@v4
         with:
           name: libavcodec-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavcodec.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -405,17 +405,17 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libavformat)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libavformat.so (as libffmpeg.mx.so)
+      - name: Upload libavformat.so
         uses: actions/upload-artifact@v4
         with:
           name: libavformat-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavformat.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -480,17 +480,17 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libavutil)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libavutil.so (as libffmpeg.mx.so)
+      - name: Upload libavutil.so
         uses: actions/upload-artifact@v4
         with:
           name: libavutil-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavutil.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -555,17 +555,17 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libavfilter)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libavfilter.so (as libffmpeg.mx.so)
+      - name: Upload libavfilter.so
         uses: actions/upload-artifact@v4
         with:
           name: libavfilter-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavfilter.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -630,17 +630,17 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libswscale)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libswscale.so (as libffmpeg.mx.so)
+      - name: Upload libswscale.so
         uses: actions/upload-artifact@v4
         with:
           name: libswscale-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libswscale.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -705,16 +705,16 @@ jobs:
             NDK_APP_DST_DIR=libs/arm64-v8a \
             TARGET_ARCH=arm64
       
-      - name: Build FFmpeg (contains libswresample)
+      - name: Build FFmpeg (Shared Libs)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh arm64
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
       
-      - name: Upload libswresample.so (as libffmpeg.mx.so)
+      - name: Upload libswresample.so
         uses: actions/upload-artifact@v4
         with:
           name: libswresample-arm64-v8a
-          path: ffmpeg/jni/libs/arm64-v8a/libffmpeg.mx.so
+          path: ffmpeg/jni/libs/arm64-v8a/libswresample.so
           retention-days: 7
           if-no-files-found: warn

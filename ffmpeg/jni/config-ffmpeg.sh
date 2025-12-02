@@ -287,17 +287,34 @@ fi
 SYSROOT=${TOOLCHAIN}/sysroot
 
 #configure common options
-FFCOMMON="\
---enable-asm \
---disable-debug \
---disable-doc \
---disable-programs \
---disable-shared \
---disable-symver \
---enable-optimizations \
---enable-pic \
---enable-pthreads \
---enable-static \
+#configure common options
+if [ "$ENABLE_SHARED_LIBS" = "true" ]; then
+    FFCOMMON="\
+    --enable-asm \
+    --disable-debug \
+    --disable-doc \
+    --disable-programs \
+    --enable-shared \
+    --disable-static \
+    --disable-symver \
+    --enable-optimizations \
+    --enable-pic \
+    --enable-pthreads \
+    "
+else
+    FFCOMMON="\
+    --enable-asm \
+    --disable-debug \
+    --disable-doc \
+    --disable-programs \
+    --disable-shared \
+    --disable-symver \
+    --enable-optimizations \
+    --enable-pic \
+    --enable-pthreads \
+    --enable-static \
+    "
+fi
 " 
 FF_FEATURE_CLASS="\
 --disable-avdevice \
