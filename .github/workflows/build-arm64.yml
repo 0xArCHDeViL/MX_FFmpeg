@@ -31,10 +31,16 @@ jobs:
           java-version: '17'
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build libsmb2 (arm64)
         run: |
@@ -94,10 +100,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build libsmb2
         run: |
@@ -123,10 +135,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build libmp3lame
         working-directory: ffmpeg/jni
@@ -156,10 +174,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build libmxutil
         working-directory: ffmpeg/jni
@@ -192,10 +216,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
@@ -248,10 +278,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
@@ -304,10 +340,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
@@ -360,10 +402,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
@@ -416,10 +464,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
@@ -472,10 +526,16 @@ jobs:
           submodules: recursive
       
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
       - name: Build dependencies first
         working-directory: ffmpeg/jni
