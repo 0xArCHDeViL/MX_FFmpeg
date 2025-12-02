@@ -42,6 +42,20 @@ jobs:
           echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
+      - name: Cache OpenSSL Libraries
+        id: cache-openssl
+        uses: actions/cache@v3
+        with:
+          path: ffmpeg/jni/openssl-1.0.2s/*.a
+          key: openssl-1.0.2s-arm64-${{ hashFiles('ffmpeg/jni/build-openssl.sh') }}
+      
+      - name: Build OpenSSL (arm64)
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+      
       - name: Build libsmb2 (arm64)
         run: |
           cd ffmpeg/jni
@@ -185,6 +199,20 @@ jobs:
           echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
       
+      - name: Cache OpenSSL Libraries
+        id: cache-openssl
+        uses: actions/cache@v3
+        with:
+          path: ffmpeg/jni/openssl-1.0.2s/*.a
+          key: openssl-1.0.2s-arm64-${{ hashFiles('ffmpeg/jni/build-openssl.sh') }}
+      
+      - name: Build OpenSSL (arm64)
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+      
       - name: Build libmxutil
         working-directory: ffmpeg/jni
         run: |
@@ -230,6 +258,10 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
@@ -292,6 +324,10 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
