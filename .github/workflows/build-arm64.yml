@@ -48,6 +48,15 @@ jobs:
         run: |
           chmod +x build-openssl.sh
           ./build-openssl.sh arm64
+
+      - name: Copy OpenSSL to Source Dir (Cache Fix)
+        working-directory: ffmpeg/jni
+        run: |
+          # Ensure libssl.a and libcrypto.a are in openssl-1.0.2s/ where Android.mk expects them
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
       
       - name: Install Meson and Ninja
         run: |
@@ -219,6 +228,15 @@ jobs:
         run: |
           chmod +x build-openssl.sh
           ./build-openssl.sh arm64
+
+      - name: Copy OpenSSL to Source Dir (Cache Fix)
+        working-directory: ffmpeg/jni
+        run: |
+          # Ensure libssl.a and libcrypto.a are in openssl-1.0.2s/ where Android.mk expects them
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
       
       - name: Install Meson and Ninja
         run: |
