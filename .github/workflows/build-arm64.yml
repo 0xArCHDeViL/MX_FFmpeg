@@ -227,6 +227,17 @@ jobs:
           chmod +x build-openssl.sh
           ./build-openssl.sh arm64
       
+      - name: Install Meson and Ninja
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+      
+      - name: Build dav1d (arm64)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+      
       - name: Build libmxutil
         working-directory: ffmpeg/jni
         run: |
@@ -276,6 +287,14 @@ jobs:
           # Build OpenSSL
           chmod +x build-openssl.sh
           ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
           
           # Build libsmb2
           chmod +x build-libsmb2.sh
@@ -343,6 +362,14 @@ jobs:
           # Build OpenSSL
           chmod +x build-openssl.sh
           ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
           
           # Build libsmb2
           chmod +x build-libsmb2.sh
