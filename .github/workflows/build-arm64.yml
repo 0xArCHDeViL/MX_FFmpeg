@@ -107,7 +107,7 @@ jobs:
         with:
           name: all-libraries-arm64-v8a
           path: |
-            ffmpeg/libs/arm64-v8a/*.so
+            ffmpeg/jni/libs/arm64-v8a/*.so
           retention-days: 7
 
   # ============================================
@@ -310,7 +310,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libavcodec-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libavcodec.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavcodec.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -377,7 +377,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libavformat-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libavformat.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavformat.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -440,7 +440,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libavutil-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libavutil.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavutil.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -503,7 +503,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libavfilter-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libavfilter.so
+          path: ffmpeg/jni/libs/arm64-v8a/libavfilter.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -566,7 +566,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libswscale-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libswscale.so
+          path: ffmpeg/jni/libs/arm64-v8a/libswscale.so
           retention-days: 7
           if-no-files-found: warn
 
@@ -629,6 +629,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libswresample-arm64-v8a
-          path: ffmpeg/libs/arm64-v8a/libswresample.so
+          path: ffmpeg/jni/libs/arm64-v8a/libswresample.so
           retention-days: 7
           if-no-files-found: warn
