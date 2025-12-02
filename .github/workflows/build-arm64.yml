@@ -445,6 +445,18 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
@@ -508,6 +520,18 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
@@ -571,6 +595,18 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
@@ -634,6 +670,18 @@ jobs:
       - name: Build dependencies first
         working-directory: ffmpeg/jni
         run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+
           # Build libsmb2
           chmod +x build-libsmb2.sh
           ./build-libsmb2.sh arm64
@@ -660,8 +708,8 @@ jobs:
       - name: Build FFmpeg (contains libswresample)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libswresample.so
         uses: actions/upload-artifact@v4
