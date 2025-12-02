@@ -415,6 +415,8 @@ usb/usb_wrap.c \
 download/downloadhttp_wrap.c \
 sort.c
 
+LOCAL_MODULE := mxutil
+
 # v5, v6(+vfp)를 제외하고는 Android M의 OpenSSL 제거에 대응하기 위해 mxutil에 wrapper를 넣는다.
 #ifneq ($(ARCH),$(filter $(ARCH),armv5te armv6))
 #   LOCAL_SRC_FILES += openssl/openssl_wrap.c
