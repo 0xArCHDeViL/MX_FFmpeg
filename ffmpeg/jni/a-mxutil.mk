@@ -26,7 +26,9 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 # libdav1d
 include $(CLEAR_VARS)
-LOCAL_PATH  := $(MY_DIR)/dav1d/builddir/$(TARGET_ARCH_ABI)/src
+# NOTE: TARGET_ARCH_ABI is defined later in a-arch-*.mk, so we hardcode the path
+# This matches the output from build-libdav1d.sh for arm64
+LOCAL_PATH  := $(MY_DIR)/dav1d/builddir/arm64-v8a/src
 LOCAL_MODULE    := dav1d
 LOCAL_SRC_FILES := libdav1d.a
 include $(PREBUILT_STATIC_LIBRARY)
