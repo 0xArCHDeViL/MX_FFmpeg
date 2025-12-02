@@ -1,7 +1,12 @@
 #!/bin/bash
 ROOT=$(cd "$(dirname "$0")"; pwd)
 source ${ROOT}/util.sh
-source ENV
+
+# Only load ENV if NDK is not already set (for local builds)
+# GitHub Actions sets NDK via environment, so we preserve it
+if [ -z "${NDK}" ]; then
+    source ENV
+fi
 
 log_file=rebuild-ffmpeg.log
 

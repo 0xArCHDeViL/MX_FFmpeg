@@ -1,6 +1,10 @@
 #!/bin/bash
 
-. ENV # Environment
+# Only load ENV if NDK is not already set (for local builds)
+# GitHub Actions sets NDK via environment, so we preserve it
+if [ -z "${NDK}" ]; then
+    . ENV # Environment
+fi
 
 ROOT=$(cd "$(dirname "$0")"; pwd)
 source ${ROOT}/util.sh

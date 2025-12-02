@@ -27,7 +27,11 @@ if test -t 1 && which tput >/dev/null 2>&1; then
 fi
 : ${ncols:=72}
 
-. ENV # Environment
+# Only load ENV if NDK is not already set (for local builds)
+# GitHub Actions sets NDK via environment, so we preserve it
+if [ -z "${NDK}" ]; then
+    . ENV # Environment
+fi
 
 # if [ $1 == 'tegra3' ]
 # then
