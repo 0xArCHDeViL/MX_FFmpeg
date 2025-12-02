@@ -1,0 +1,518 @@
+name: Build ARM64-V8A
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+env:
+  NDK_VERSION: '25.2.9519653'
+
+jobs:
+  # ============================================
+  # MAIN BUILD - Build All Libraries Together
+  # ============================================
+  build-all-arm64:
+    name: "Build All (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build libsmb2 (arm64)
+        run: |
+          cd ffmpeg/jni
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+        
+      - name: Build libmp3lame (arm64)
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+      
+      - name: Build libmxutil (arm64)
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg with all libraries (arm64)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload All Libraries
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-libraries-arm64-v8a
+          path: |
+            ffmpeg/libs/arm64-v8a/*.so
+          retention-days: 7
+
+  # ============================================
+  # INDIVIDUAL LIBRARY BUILDS
+  # ============================================
+  
+  build-libsmb2-arm64:
+    name: "Build libsmb2.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build libsmb2
+        run: |
+          cd ffmpeg/jni
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+      
+      - name: Upload libsmb2.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libsmb2-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libsmb2.so
+          retention-days: 7
+
+  build-libmp3lame-arm64:
+    name: "Build libmp3lame.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build libmp3lame
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+      
+      - name: Upload libmp3lame.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libmp3lame-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libmp3lame.so
+          retention-days: 7
+
+  build-libmxutil-arm64:
+    name: "Build libmxutil.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build libmxutil
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Upload libmxutil.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libmxutil-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libmxutil.so
+          retention-days: 7
+
+  build-libavcodec-arm64:
+    name: "Build libavcodec.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libavcodec)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libavcodec.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavcodec-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libavcodec.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavformat-arm64:
+    name: "Build libavformat.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libavformat)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libavformat.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavformat-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libavformat.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavutil-arm64:
+    name: "Build libavutil.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libavutil)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libavutil.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavutil-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libavutil.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavfilter-arm64:
+    name: "Build libavfilter.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libavfilter)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libavfilter.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavfilter-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libavfilter.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libswscale-arm64:
+    name: "Build libswscale.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libswscale)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libswscale.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libswscale-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libswscale.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libswresample-arm64:
+    name: "Build libswresample.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (contains libswresample)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build.sh
+          ./build.sh ffmpeg.mx build arm64
+      
+      - name: Upload libswresample.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libswresample-arm64-v8a
+          path: ffmpeg/libs/arm64-v8a/libswresample.so
+          retention-days: 7
+          if-no-files-found: warn
