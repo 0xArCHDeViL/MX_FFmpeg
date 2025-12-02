@@ -1,0 +1,661 @@
+name: Build Individual Libraries (ARM64)
+
+on:
+  workflow_dispatch:
+
+env:
+  NDK_VERSION: '25.2.9519653'
+
+jobs:
+  build-libsmb2-arm64:
+    name: "Build libsmb2.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Cache OpenSSL Libraries
+        id: cache-openssl
+        uses: actions/cache@v3
+        with:
+          path: ffmpeg/jni/openssl-1.0.2s/*.a
+          key: openssl-1.0.2s-arm64-${{ hashFiles('ffmpeg/jni/build-openssl.sh') }}
+      
+      - name: Build OpenSSL (arm64)
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+      - name: Copy OpenSSL to Source Dir (Cache Fix)
+        working-directory: ffmpeg/jni
+        run: |
+          # Ensure libssl.a and libcrypto.a are in openssl-1.0.2s/ where Android.mk expects them
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+      
+      - name: Build libsmb2
+        run: |
+          cd ffmpeg/jni
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+      
+      - name: Upload libsmb2.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libsmb2-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libsmb2.so
+          retention-days: 7
+
+  build-libmp3lame-arm64:
+    name: "Build libmp3lame.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build libmp3lame
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+      
+      - name: Upload libmp3lame.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libmp3lame-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libmp3lame.so
+          retention-days: 7
+
+  build-libmxutil-arm64:
+    name: "Build libmxutil.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Cache OpenSSL Libraries
+        id: cache-openssl
+        uses: actions/cache@v3
+        with:
+          path: ffmpeg/jni/openssl-1.0.2s/*.a
+          key: openssl-1.0.2s-arm64-${{ hashFiles('ffmpeg/jni/build-openssl.sh') }}
+      
+      - name: Build OpenSSL (arm64)
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+      - name: Copy OpenSSL to Source Dir (Cache Fix)
+        working-directory: ffmpeg/jni
+        run: |
+          # Ensure libssl.a and libcrypto.a are in openssl-1.0.2s/ where Android.mk expects them
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+      
+      - name: Install Meson and Ninja
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+      
+      - name: Build dav1d (arm64)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+      
+      - name: Build libmxutil
+        working-directory: ffmpeg/jni
+        run: |
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Upload libmxutil.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libmxutil-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libmxutil.so
+          retention-days: 7
+
+  build-libavcodec-arm64:
+    name: "Build libavcodec.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libavcodec.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavcodec-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libavcodec.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavformat-arm64:
+    name: "Build libavformat.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libavformat.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavformat-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libavformat.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavutil-arm64:
+    name: "Build libavutil.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libavutil.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavutil-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libavutil.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libavfilter-arm64:
+    name: "Build libavfilter.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libavfilter.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libavfilter-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libavfilter.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libswscale-arm64:
+    name: "Build libswscale.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libswscale.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libswscale-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libswscale.so
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-libswresample-arm64:
+    name: "Build libswresample.so (arm64-v8a)"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+          add-to-path: true
+      
+      - name: Set NDK Environment Variable
+        run: |
+          echo "NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+      
+      - name: Build dependencies first
+        working-directory: ffmpeg/jni
+        run: |
+          # Build OpenSSL
+          chmod +x build-openssl.sh
+          ./build-openssl.sh arm64
+
+          # Copy OpenSSL (Cache Fix)
+          cp openssl-1.0.2s/libssl.a openssl-1.0.2s/libcrypto.a . || true
+          mkdir -p libs/arm64-v8a
+          cp openssl-1.0.2s/libssl.a libs/arm64-v8a/
+          cp openssl-1.0.2s/libcrypto.a libs/arm64-v8a/
+          
+          # Install Meson and Ninja
+          python3 -m pip install --upgrade pip
+          pip3 install meson ninja
+          
+          # Build dav1d
+          chmod +x build-libdav1d.sh
+          ./build-libdav1d.sh arm64
+          
+          # Build libsmb2
+          chmod +x build-libsmb2.sh
+          ./build-libsmb2.sh arm64
+          
+          # Build libmp3lame
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=libmp3lame.mk \
+            NDK_APP_DST_DIR=libs/arm64-v8a
+          
+          # Build libmxutil
+          $NDK/ndk-build \
+            -j$(nproc) \
+            APP_ABI=arm64-v8a \
+            APP_PLATFORM=android-21 \
+            APP_BUILD_SCRIPT=a-mxutil.mk \
+            ARCH=armv8-a \
+            VFP=neon \
+            NDK_APP_DST_DIR=libs/arm64-v8a \
+            TARGET_ARCH=arm64
+      
+      - name: Build FFmpeg (Shared Libs)
+        working-directory: ffmpeg/jni
+        run: |
+          chmod +x build-ffmpeg-shared.sh
+          ./build-ffmpeg-shared.sh arm64
+      
+      - name: Upload libswresample.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: libswresample-arm64-v8a
+          path: ffmpeg/jni/libs/arm64-v8a/libswresample.so
+          retention-days: 7
+          if-no-files-found: warn

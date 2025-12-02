@@ -315,7 +315,7 @@ else
     --enable-static \
     "
 fi
-" 
+
 FF_FEATURE_CLASS="\
 --disable-avdevice \
 --disable-devices \
