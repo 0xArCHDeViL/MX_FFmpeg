@@ -99,8 +99,8 @@ jobs:
       - name: Build FFmpeg with all libraries (arm64)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload All Libraries
         uses: actions/upload-artifact@v4
@@ -303,8 +303,8 @@ jobs:
       - name: Build FFmpeg (contains libavcodec)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libavcodec.so
         uses: actions/upload-artifact@v4
@@ -370,8 +370,8 @@ jobs:
       - name: Build FFmpeg (contains libavformat)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libavformat.so
         uses: actions/upload-artifact@v4
@@ -433,8 +433,8 @@ jobs:
       - name: Build FFmpeg (contains libavutil)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libavutil.so
         uses: actions/upload-artifact@v4
@@ -496,8 +496,8 @@ jobs:
       - name: Build FFmpeg (contains libavfilter)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libavfilter.so
         uses: actions/upload-artifact@v4
@@ -559,8 +559,8 @@ jobs:
       - name: Build FFmpeg (contains libswscale)
         working-directory: ffmpeg/jni
         run: |
-          chmod +x build.sh
-          ./build.sh ffmpeg.mx build arm64
+          chmod +x build-ffmpeg.sh
+          ./build-ffmpeg.sh arm64
       
       - name: Upload libswscale.so
         uses: actions/upload-artifact@v4
