@@ -415,6 +415,7 @@ usb/usb_wrap.c \
 download/downloadhttp_wrap.c \
 sort.c
 
+NAME := mxutil
 LOCAL_MODULE := mxutil
 
 # v5, v6(+vfp)를 제외하고는 Android M의 OpenSSL 제거에 대응하기 위해 mxutil에 wrapper를 넣는다.
@@ -436,13 +437,18 @@ LOCAL_LDFLAGS := -Wl,--version-script=$(MY_DIR)/version_scripts/mxutil \
 
 
 include $(MY_DIR)/a-arch-$(TARGET_ARCH).mk
+
+# Explicitly set LOCAL_MODULE here to ensure it is not overwritten or empty
+LOCAL_MODULE := mxutil
 LOCAL_ASFLAGS := $(LOCAL_CFLAGS)
+
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
+    LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
 else ifeq ($(TARGET_ARCH),arm64)
-LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
+    LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
 else
-LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
+    LOCAL_STATIC_LIBRARIES := opus speex modplug ssl crypto xml2 dav1d
 endif
+
 include $(BUILD_SHARED_LIBRARY)
 
